@@ -1,0 +1,37 @@
+# WatchDog AI Systemd 服务【参考模板】
+#
+# 注意：install.sh 会自动按安装目录/端口动态生成此 unit 并安装，
+# 不需要你手动复制本文件。此文件仅供了解服务定义或手动部署时参考。
+# 手动部署：sudo cp watchdog.service /etc/systemd/system/ && sudo systemctl enable --now watchdog
+#
+# 默认安装路径：/opt/watchdog（如自定义请修改下面相关行）
+[Unit]
+Description=WatchDog AI 智能运维面板
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+# 工作目录：二进制与 data/ 都放在这里
+WorkingDirectory=/opt/watchdog
+# 可执行文件路径（go build 产物）
+ExecStart=/opt/watchdog/watchdog
+# 监听端口（默认 9191，可用环境变量覆盖）
+Environment=WATCHDOG_BIND=:9191
+Environment=WATCHDOG_DATA_DIR=/opt/watchdog/data
+
+# 安全加固：只读 /usr /boot /etc，仅暴露工作目录可写
+ProtectSystem=full
+ReadWritePaths=/opt/watchdog
+PrivateTmp=true
+NoNewPrivileges=true
+
+# 崩溃自动重启
+Restart=on-failure
+RestartSec=3
+
+# 运行用户（建议单独建 watchdog 账号，避免用 root）
+User=watchdog
+Group=watchdog
+
+[Install]
+WantedBy=multi-user.target

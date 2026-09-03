@@ -1,0 +1,28 @@
+# WatchDog AI —— Docker Compose 部署
+#
+# 用法：
+#   docker compose up -d          （自动构建并启动）
+#   或 docker compose -f deploy/docker-compose.yml up -d
+#
+# 访问： http://服务器IP:9191
+# 数据持久化：默认卷 watchdog-data（也可改 bind 挂载）
+
+services:
+  watchdog:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    image: watchdog-ai:latest
+    container_name: watchdog
+    restart: unless-stopped
+    ports:
+      - "9191:9191"
+    environment:
+      - WATCHDOG_BIND=:9191
+      - WATCHDOG_DATA_DIR=/app/data
+    volumes:
+      - watchdog-data:/app/data
+
+volumes:
+  watchdog-data:
+    driver: local

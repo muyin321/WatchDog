@@ -1,0 +1,39 @@
+# GoReleaser 配置：构建单二进制并附带 Systemd 服务模板
+# 平台：linux amd64 / arm64 / 386
+version: 2
+
+before:
+  hooks:
+    - go mod tidy
+    # 先构建前端产物，保证 release 归档免 Node 即可安装
+    - cd web && npm ci --no-audit --no-fund && npm run build
+
+builds:
+  - id: watchdog
+    main: ./cmd/watchdog
+    binary: watchdog
+    env:
+      - CGO_ENABLED=0          # 纯 Go SQLite，静态编译
+    goos:
+      - linux
+    goarch:
+      - amd64
+      - arm64
+      - "386"
+    ldflags:
+      - -s -w
+
+archives:
+  - id: watchdog
+    name_template: "watchdog-{{ .Version }}-{{ .Os }}-{{ .Arch }}"
+    files:
+      - README.md
+      - deploy/watchdog.service
+      - deploy/install.sh
+
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - '^docs:'
+      - '^test:'

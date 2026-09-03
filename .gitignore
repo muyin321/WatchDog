@@ -1,0 +1,16 @@
+# 二进制与构建产物
+watchdog
+/dist
+# 前端产物 web/dist 允许提交进仓库，保证 clone 后免 Node 即可一键安装
+node_modules
+npm-debug.log*
+
+# 运行时数据目录
+data/
+backups/
+
+# 编译器/编辑器
+*.log
+.DS_Store
+.idea/
+.vscode/
